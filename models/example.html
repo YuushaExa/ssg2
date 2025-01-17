@@ -1,4 +1,9 @@
   <title>Chat AI</title>
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css"
+  rel="stylesheet"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     /* Combined and Minified CSS */
@@ -206,6 +211,14 @@
   <script>
     (function () {
       /* Main chat code */
+marked.setOptions({
+  highlight: function (code, language) {
+    const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+    return hljs.highlight(code, { language: validLanguage }).value;
+  },
+});
+
+      
       function initializeChat() {
         (async function () {
           // --- DOM Element Access ---
@@ -221,30 +234,35 @@
 
           let chatHistory = [];
 
-          function updateChatDisplay() {
-            messagesContainer.innerHTML = "";
-            const fragment = document.createDocumentFragment();
+         function updateChatDisplay() {
+  messagesContainer.innerHTML = "";
+  const fragment = document.createDocumentFragment();
 
-            for (const message of chatHistory) {
-              const messageElement = document.createElement("div");
-              messageElement.classList.add(
-                message.role === "user" ? "user-message" : "model-message"
-              );
+  for (const message of chatHistory) {
+    const messageElement = document.createElement("div");
+    messageElement.classList.add(
+      message.role === "user" ? "user-message" : "model-message"
+    );
 
-              // Parse and display message content using marked
-              if (message.role === "model") {
-                messageElement.innerHTML = marked.parse(message.parts[0].text);
-              } else {
-                messageElement.textContent = message.parts[0].text;
-              }
+    // Parse and display message content using marked
+    if (message.role === "model") {
+      messageElement.innerHTML = marked.parse(message.parts[0].text);
+    } else {
+      messageElement.textContent = message.parts[0].text;
+    }
 
-              fragment.appendChild(messageElement);
-            }
+    fragment.appendChild(messageElement);
+  }
 
-            messagesContainer.appendChild(fragment);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-          }
+  messagesContainer.appendChild(fragment);
 
+  // Apply syntax highlighting to code blocks
+  document.querySelectorAll("pre code").forEach((block) => {
+    hljs.highlightBlock(block);
+  });
+
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
           function addMessageToChatHistory(role, content) {
             chatHistory.push({ role, parts: [{ text: content }] });
             updateChatDisplay();

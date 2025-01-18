@@ -7,15 +7,59 @@
     <style>
         body {
             font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: #f8f9fa;
         }
         #results {
             margin-top: 20px;
+            width: 80%;
+            max-width: 800px;
         }
         .result {
             margin-bottom: 10px;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .title {
             font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        #searchForm {
+            width: 80%;
+            max-width: 800px;
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        #query {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+        #searchForm button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        #searchForm button:hover {
+            background-color: #0056b3;
+        }
+        #loading {
+            display: none;
+            margin-top: 20px;
+            color: #007bff;
         }
     </style>
 </head>
@@ -26,6 +70,7 @@
         <button type="submit">Search</button>
     </form>
 
+    <div id="loading">Loading...</div>
     <div id="results">
         <!-- Search results will be displayed here -->
     </div>
@@ -34,47 +79,43 @@
         const searchForm = document.getElementById('searchForm');
         const queryInput = document.getElementById('query');
         const resultsDiv = document.getElementById('results');
+        const loadingIndicator = document.getElementById('loading');
 
         searchForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+            event.preventDefault(); // Prevent default form submission
+
             const query = queryInput.value;
+            if (!query) {
+                alert('Please enter a search query.');
+                return;
+            }
+
+            resultsDiv.innerHTML = ''; // Clear previous results
+            loadingIndicator.style.display = 'block'; // Show loading indicator
 
             try {
-                const response = await fetch('https://chatai2-psi.vercel.app/api/search', { // Replace with your server URL
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ query })
-                });
+                const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Search failed.');
+                }
 
                 const data = await response.json();
 
-                resultsDiv.innerHTML = ''; // Clear previous results
+                // Display the result (assuming it's plain text for now)
+                const resultElement = document.createElement('div');
+                resultElement.classList.add('result');
+                resultElement.textContent = data.result;
+                resultsDiv.appendChild(resultElement);
 
-                if (data.error) {
-                    resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
-                } else {
-                    // Insert the received HTML into the resultsDiv
-                    resultsDiv.innerHTML = data.result;
-
-                    // Extract text from llm-output divs
-                    const chatDivs = resultsDiv.querySelectorAll('div[class*="llm-output svelte"]');
-                    if (chatDivs.length > 0) {
-                        let allText = '';
-                        chatDivs.forEach((div) => {
-                            // Concatenate the text content of each div
-                            allText += div.innerText.trim() + ' ';
-                        });
-                        // Replace the content of resultsDiv with the extracted text
-                        resultsDiv.innerHTML = `<p>${allText.trim()}</p>`;
-                    } else {
-                        resultsDiv.innerHTML = '<p>No text response found.</p>';
-                    }
-                }
             } catch (error) {
                 console.error(error);
-                resultsDiv.innerHTML = `<p>An error occurred while fetching results.</p>`;
+                const errorElement = document.createElement('div');
+                errorElement.classList.add('result');
+                errorElement.textContent = `Error: ${error.message}`;
+                resultsDiv.appendChild(errorElement);
+            } finally {
+                loadingIndicator.style.display = 'none'; // Hide loading indicator
             }
         });
     </script>

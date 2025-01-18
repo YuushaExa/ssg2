@@ -1,80 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat API</title>
+    <title>DuckDuckGo Chat</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        #chatbox {
+            width: 500px;
+            height: 300px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            padding: 10px;
+        }
+        #inputArea {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Chat with AI</h1>
-  <form id="chatForm">
-    <label for="model">Model:</label>
-    <select id="model">
-      <option value="gpt-4o-mini">GPT-4 Mini</option>
-      <option value="claude-3-haiku">Claude 3 Haiku</option>
-      <option value="llama">Llama</option>
-      <option value="mixtral">Mixtral</option>
-    </select>
-    <br>
-    <label for="message">Message:</label>
-    <input type="text" id="message" required>
-    <br>
-    <button type="submit">Send</button>
-  </form>
-  <h2>Response:</h2>
-  <pre id="response"></pre>
+    <h1>DuckDuckGo AI Chat</h1>
 
-  <script>
-    const chatForm = document.getElementById("chatForm");
-    const responseElement = document.getElementById("response");
+    <div id="chatbox"></div>
 
-    chatForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const model = document.getElementById("model").value;
-      const message = document.getElementById("message").value;
+    <div id="inputArea">
+        <select id="modelSelect">
+            <option value="gpt-4o-mini">gpt-4o-mini</option>
+            <option value="claude-3-haiku">claude-3-haiku</option>
+            <option value="llama">llama</option>
+            <option value="mixtral">mixtral</option>
+        </select>
+        <input type="text" id="messageInput" placeholder="Enter your message">
+        <button id="sendButton">Send</button>
+    </div>
 
-      try {
-        // Initialize Chat
-        const initResponse = await fetch("https://chatai2-w3m1.vercel.app/init", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model }),
+    <script>
+        const chatbox = document.getElementById('chatbox');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const modelSelect = document.getElementById('modelSelect');
+
+        let chatInitialized = false;
+
+        async function initChat() {
+            const response = await fetch('chatai2-psi.vercel.app/init', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ model: modelSelect.value })
+            });
+
+            if (response.ok) {
+                chatInitialized = true;
+                addToChatbox('System: Chat initialized!');
+            } else {
+                addToChatbox('Error initializing chat.');
+            }
+        }
+
+        async function sendMessage() {
+            if (!chatInitialized) {
+                addToChatbox('Please initialize the chat first.');
+                return;
+            }
+
+            const message = messageInput.value;
+            messageInput.value = '';
+            addToChatbox('You: ' + message);
+
+            const response = await fetch('chatai2-psi.vercel.app/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            if (response.ok) {
+                const text = await response.text();
+                addToChatbox('AI: ' + text);
+            } else {
+                addToChatbox('Error sending message.');
+            }
+        }
+
+        function addToChatbox(message) {
+            chatbox.innerHTML += '<p>' + message + '</p>';
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         });
 
-        if (!initResponse.ok) {
-          throw new Error(`Failed to initialize chat: ${initResponse.statusText}`);
-        }
-
-        const { vqd } = await initResponse.json();
-
-        // Send Message (Streaming)
-        const chatResponse = await fetch("https://chatai2-w3m1.vercel.app/chat/stream", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ vqd, model, content: message }),
+        modelSelect.addEventListener('change', () => {
+            chatInitialized = false;
+            chatbox.innerHTML = '';
+            initChat();
         });
 
-        if (!chatResponse.ok) {
-          throw new Error(`Failed to send message: ${chatResponse.statusText}`);
-        }
-
-        // Handle Streaming Response
-        const reader = chatResponse.body.getReader();
-        const decoder = new TextDecoder();
-        responseElement.textContent = ""; // Clear previous response
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          responseElement.textContent += chunk; // Append each chunk to the response
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        responseElement.textContent = `Error: ${error.message}`;
-      }
-    });
-  </script>
+        initChat();
+    </script>
 </body>
 </html>

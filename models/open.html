@@ -33,21 +33,24 @@
       const model = document.getElementById("model").value;
       const message = document.getElementById("message").value;
 
-      try {
-        // Send Message and Get Full Response
-        const chatResponse = await fetch("chatai2-w3m1.vercel.app/chat/full", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ model, content: message }),
-        });
-        const { response } = await chatResponse.json();
+      // Initialize Chat
+      const initResponse = await fetch("https://chatai2-w3m1.vercel.app/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model }),
+      });
+      const { vqd } = await initResponse.json();
 
-        // Display Response
-        responseElement.textContent = response;
-      } catch (error) {
-        console.error("Error:", error);
-        responseElement.textContent = "An error occurred. Please try again.";
-      }
+      // Send Message
+      const chatResponse = await fetch("https://chatai2-w3m1.vercel.app/chat/full", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vqd, model, content: message }),
+      });
+      const { response } = await chatResponse.json();
+
+      // Display Response
+      responseElement.textContent = response;
     });
   </script>
 </body>

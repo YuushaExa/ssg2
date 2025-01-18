@@ -40,7 +40,7 @@
             const query = queryInput.value;
 
             try {
-                const response = await fetch('https://chatai2-psi.vercel.app/api/search', {
+                const response = await fetch('https://chatai2-psi.vercel.app/api/search', { // Replace with your server URL
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -55,14 +55,8 @@
                 if (data.error) {
                     resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
                 } else {
-                    data.forEach(result => {
-                        const resultElement = `
-                            <div class="result">
-                                <a href="${result.url}" target="_blank" class="title">${result.title}</a>
-                            </div>
-                        `;
-                        resultsDiv.innerHTML += resultElement;
-                    });
+                    // Display the extracted text response
+                    resultsDiv.innerHTML = `<p>${data.result}</p>`;
                 }
             } catch (error) {
                 console.error(error);

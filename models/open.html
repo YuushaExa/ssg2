@@ -33,24 +33,47 @@
       const model = document.getElementById("model").value;
       const message = document.getElementById("message").value;
 
-      // Initialize Chat
-      const initResponse = await fetch("https://chatai2-w3m1.vercel.app/init", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model }),
-      });
-      const { vqd } = await initResponse.json();
+      try {
+        // Initialize Chat
+        const initResponse = await fetch("https://chatai2-w3m1.vercel.app/init", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model }),
+        });
 
-      // Send Message
-      const chatResponse = await fetch("https://chatai2-w3m1.vercel.app/chat/stream", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vqd, model, content: message }),
-      });
-      const { response } = await chatResponse.json();
+        if (!initResponse.ok) {
+          throw new Error(`Failed to initialize chat: ${initResponse.statusText}`);
+        }
 
-      // Display Response
-      responseElement.textContent = response;
+        const { vqd } = await initResponse.json();
+
+        // Send Message (Streaming)
+        const chatResponse = await fetch("https://chatai2-w3m1.vercel.app/chat/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ vqd, model, content: message }),
+        });
+
+        if (!chatResponse.ok) {
+          throw new Error(`Failed to send message: ${chatResponse.statusText}`);
+        }
+
+        // Handle Streaming Response
+        const reader = chatResponse.body.getReader();
+        const decoder = new TextDecoder();
+        responseElement.textContent = ""; // Clear previous response
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          responseElement.textContent += chunk; // Append each chunk to the response
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        responseElement.textContent = `Error: ${error.message}`;
+      }
     });
   </script>
 </body>

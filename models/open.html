@@ -55,22 +55,8 @@
                 if (data.error) {
                     resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
                 } else {
-                    // Insert the received HTML into the resultsDiv
-                    resultsDiv.innerHTML = data.result;
-
-                    // Extract text from llm-output divs
-                    const chatDivs = resultsDiv.querySelectorAll('div[class*="llm-output svelte"]');
-                    if (chatDivs.length > 0) {
-                        let allText = '';
-                        chatDivs.forEach((div) => {
-                            // Concatenate the text content of each div
-                            allText += div.innerText.trim() + ' ';
-                        });
-                        // Replace the content of resultsDiv with the extracted text
-                        resultsDiv.innerHTML = `<p>${allText.trim()}</p>`;
-                    } else {
-                        resultsDiv.innerHTML = '<p>No text response found.</p>';
-                    }
+                    // Display the extracted text response
+                    resultsDiv.innerHTML = `<p>${data.result}</p>`;
                 }
             } catch (error) {
                 console.error(error);

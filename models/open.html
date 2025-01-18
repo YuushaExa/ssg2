@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat API</title>
+</head>
+<body>
+  <h1>Chat with AI</h1>
+  <form id="chatForm">
+    <label for="model">Model:</label>
+    <select id="model">
+      <option value="gpt-4o-mini">GPT-4 Mini</option>
+      <option value="claude-3-haiku">Claude 3 Haiku</option>
+      <option value="llama">Llama</option>
+      <option value="mixtral">Mixtral</option>
+    </select>
+    <br>
+    <label for="message">Message:</label>
+    <input type="text" id="message" required>
+    <br>
+    <button type="submit">Send</button>
+  </form>
+  <h2>Response:</h2>
+  <pre id="response"></pre>
+
+  <script>
+    const chatForm = document.getElementById("chatForm");
+    const responseElement = document.getElementById("response");
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const model = document.getElementById("model").value;
+      const message = document.getElementById("message").value;
+
+      try {
+        // Send Message and Get Full Response
+        const chatResponse = await fetch("chatai2-w3m1.vercel.app/chat/full", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model, content: message }),
+        });
+        const { response } = await chatResponse.json();
+
+        // Display Response
+        responseElement.textContent = response;
+      } catch (error) {
+        console.error("Error:", error);
+        responseElement.textContent = "An error occurred. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>

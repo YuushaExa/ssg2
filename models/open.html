@@ -106,7 +106,7 @@
             addMessageToHistory('user', prompt);
 
             // Add the user's message to the conversation history
-            conversationHistory.push({ role: 'user', content: prompt });
+            conversationHistory.push(prompt);
 
             // Clear the input field
             promptInput.value = '';
@@ -118,7 +118,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ prompt, history: conversationHistory }),
+                    body: JSON.stringify({ 
+                        prompt, 
+                        history: conversationHistory.join('\n') // Send the entire history as plain text
+                    }),
                 });
 
                 if (!response.ok) {
@@ -131,7 +134,7 @@
                 addMessageToHistory('bot', data.response);
 
                 // Add the bot's response to the conversation history
-                conversationHistory.push({ role: 'assistant', content: data.response });
+                conversationHistory.push(data.response);
             } catch (error) {
                 console.error('Error:', error);
                 addMessageToHistory('bot', 'An error occurred while fetching the response.');

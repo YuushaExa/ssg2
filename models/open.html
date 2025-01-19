@@ -85,9 +85,6 @@
         const promptInput = document.getElementById('prompt-input');
         const sendButton = document.getElementById('send-button');
 
-        // Array to store the conversation history
-        let conversationHistory = [];
-
         // Function to add a message to the chat history
         function addMessageToHistory(role, message) {
             const messageDiv = document.createElement('div');
@@ -105,23 +102,17 @@
             // Add the user's message to the chat history
             addMessageToHistory('user', prompt);
 
-            // Add the user's message to the conversation history
-            conversationHistory.push(prompt);
-
             // Clear the input field
             promptInput.value = '';
 
             try {
-                // Send the prompt and conversation history to the API
+                // Send the prompt to the API
                 const response = await fetch('https://chatai3-zeta.vercel.app/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ 
-                        prompt, 
-                        history: conversationHistory.join('\n') // Send the entire history as plain text
-                    }),
+                    body: JSON.stringify({ prompt, history: [] }), // You can modify this to include chat history
                 });
 
                 if (!response.ok) {
@@ -132,9 +123,6 @@
 
                 // Add the bot's response to the chat history
                 addMessageToHistory('bot', data.response);
-
-                // Add the bot's response to the conversation history
-                conversationHistory.push(data.response);
             } catch (error) {
                 console.error('Error:', error);
                 addMessageToHistory('bot', 'An error occurred while fetching the response.');

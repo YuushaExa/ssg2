@@ -67,7 +67,7 @@
         // Load YouTube video
         document.getElementById(
           "player"
-        ).src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+        ).src = `https://www.youtube.com/embed/${videoId}`;
 
         // Fetch transcript
         fetchTranscript(videoId);
@@ -81,19 +81,24 @@
       }
 
       function fetchTranscript(videoId) {
-        $.ajax({
-          url: `https://video.google.com/timedtext?type=track&v=${videoId}&lang=en`,
-          dataType: "xml",
-        })
-          .done(function (data) {
-            const captions = $(data).find("text");
+        const url = `https://video.google.com/timedtext?type=track&v=${videoId}&lang=en`;
+
+        fetch(url)
+          .then((response) => response.text())
+          .then((data) => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data, "text/xml");
+            const captions = xmlDoc.getElementsByTagName("text");
             let transcript = "";
-            captions.each(function () {
-              transcript += $(this).text() + "<br>";
-            });
+
+            for (let i = 0; i < captions.length; i++) {
+              const caption = captions[i].textContent;
+              transcript += caption + "<br>";
+            }
+
             document.getElementById("transcript").innerHTML = transcript;
           })
-          .fail(function () {
+          .catch(() => {
             alert("Failed to fetch transcript. Captions may not be available.");
           });
       }

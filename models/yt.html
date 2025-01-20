@@ -2,20 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Google Tag Manager -->
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-5WQWFG7");
-    </script>
-    <!-- End Google Tag Manager -->
+
 
     <meta charset="utf-8" />
     <meta
@@ -55,20 +42,6 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-HWDD7ERPNX"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-HWDD7ERPNX");
-    </script>
 
     <script type="text/javascript">
       if (
@@ -455,28 +428,7 @@
         }
       }
 
-      // Sample Markers on Page
-      var MarkersInit = function (markers) {
-        var elements = document.querySelectorAll(".youtube-marker");
-        Array.prototype.forEach.call(elements, function (el, i) {
-          var time_start = el.dataset.start;
-          var time_end = el.dataset.end;
-          var id = el.dataset.id;
-          if (id >= 1) {
-            id = id - 1;
-          } else {
-            id = 0;
-          }
-          marker = {};
-          marker.time_start = time_start;
-          marker.time_end = time_end;
-          marker.dom = el;
-          if (typeof markers[id] === "undefined") {
-            markers[id] = [];
-          }
-          markers[id].push(marker);
-        });
-      };
+
 
       // On Ready
       var markers = [];

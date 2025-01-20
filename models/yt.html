@@ -1,17 +1,76 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Caption Extractor</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-  <input type="text" id="video_url" placeholder="Enter YouTube Video URL">
-  <button onclick="processVideo(false)">Get Captions</button>
-  <div id="embedded_video"></div>
-  <div id="demo"></div>
-  <script>
+  <head>
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-5WQWFG7");
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>YouTube Transcript - read YouTube videos</title>
+
+    <!-- Bootstrap core CSS -->
+    <link
+      href="static/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="static/css/video.css" rel="stylesheet" />
+
+    <!-- Custom fonts for this template -->
+    <link
+      href="static/vendor/fontawesome-free/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="static/vendor/simple-line-icons/css/simple-line-icons.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/landing-page.css" rel="stylesheet" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-HWDD7ERPNX"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-HWDD7ERPNX");
+    </script>
+
+    <script type="text/javascript">
       if (
         location.protocol !== "https:" &&
         location.hostname !== "localhost" &&
@@ -650,6 +709,260 @@
           downloadMerlinATag.href =
             "https://cn4h.short.gy/yt-transcript-merlin-ext";
         }
-      });  </script>
-</body>
+      });
+    </script>
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-5WQWFG7"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-light static-top">
+      <div class="container">
+        <span class="navbar-brand" id="title">YouTube Transcript</span>
+        <div id="title-search" style="display: none">
+          <form action="javascript:;">
+            <div class="form-row">
+              <div class="col-12 col-md-9 mb-2 mb-md-0">
+                <input
+                  id="video_url_top"
+                  class="form-control form-control-lg"
+                  placeholder="enter a youtube url ..."
+                />
+              </div>
+              <div class="col-12 col-md-3">
+                <button
+                  class="btn btn-block btn-lg btn-primary"
+                  onclick="processVideo(true);"
+                >
+                  Go
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <!-- <span class="mobile-hide">Try my new <a href="https://pdf2gpt.com">automatic PDF summary</a> site</span> -->
+        <span class="mobile-hide"
+          >Create&nbsp;<a
+            href="https://www.youtubesummaries.com/?utm_source=youtubetranscript&utm_medium=website&utm_campaign=youtubesummaries"
+            rel="noopener"
+            target="_blank"
+            >youtube video summaries</a
+          >
+          &nbsp;and more</span
+        >
+      </div>
+    </nav>
+
+    <div class="container-fluid" id="outputbox" style="display: none">
+      <div class="row">
+        <div class="col-sm sticky-top" id="video_col">
+          <div class="videocontainer" id="embedded_video"></div>
+          <div class="jumplink mt-2">
+            <div class="d-flex flex-column pb-4">
+              <span>
+                <a
+                  class="merlin-pricing"
+                  target="_blank"
+                  rel="noopener"
+                  href="https://www.getmerlin.in/pricing?ref=merlin-ai"
+                >
+                  <img
+                    style="width: 100%; height: auto; border-radius: 6px"
+                    src="https://cdn.jsdelivr.net/gh/foyer-work/cdn-files@main/assets/images/banner_pr_v7.png"
+                    alt="merlin ai banner"
+                  />
+                </a>
+              </span>
+              <div
+                style="
+                  display: flex;
+                  gap: 12px;
+                  justify-content: start;
+                  align-items: end;
+                  margin-top: 2px;
+                "
+              >
+                <span class="mobile-hide"
+                  ><button
+                    class="btn btn-outline-secondary"
+                    style="margin-top: 10px; min-width: 200px"
+                    onclick="copyTranscript(this)"
+                  >
+                    Copy entire transcript
+                  </button></span
+                >
+                <a
+                  class="mt-2"
+                  style="transform: translateX(-1px);"
+                  href="javascript:;"
+                  onclick="JumpToMarker(event)"
+                  >Jump to video position in transcript</a
+                >
+                <span>
+                  <label class="mb-0"
+                    ><input
+                      type="checkbox"
+                      id="autoscroll_check"
+                      onclick="ToggleAutoscroll(event)"
+                    />
+                    Autoscroll</label
+                  >
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm">
+          <div id="demo" style="word-break: break-word">
+            <i>Loading captions...</i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <span
+      class="desktop-hide"
+      style="margin: 30px; margin-left: 10px; display: none"
+      id="mobile-copy-transcript"
+    >
+      <button
+        class="btn btn-outline-secondary"
+        style="margin-top: 10px; min-width: 200px"
+        onclick="copyTranscript(this)"
+      >
+        Copy entire transcript
+      </button>
+      <br />
+     
+    <!-- Masthead -->
+    <header class="masthead text-white text-center">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-9 mx-auto">
+            <h1 class="mb-5" id="header_text">Get a transcript:</h1>
+          </div>
+          <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+            <form action="javascript:;">
+              <div class="form-row">
+                <div class="col-12 col-md-9 mb-2 mb-md-0">
+                  <input
+                    id="video_url"
+                    class="form-control form-control-lg"
+                    placeholder="enter a youtube url ..."
+                  />
+                </div>
+                <div class="col-12 col-md-3">
+                  <button
+                    class="btn btn-block btn-lg btn-primary"
+                    onclick="processVideo(false);"
+                  >
+                    Go
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- hotfix -->
+        <style>
+          .hover-link {
+            color: white;
+            text-decoration: underline;
+          }
+          .hover-link:hover {
+            color: #007bff;
+          }
+        </style>
+
+        <div class="mt-4">
+          <div class="col-xl-9 mx-auto">
+            <p class="my-4" id="header_text">Or</p>
+            <a
+              target="_blank"
+              rel="noopener"
+              href="https://chromewebstore.google.com/detail/merlin-1-click-access-to/camppjleccjaphfdbohjdohecfnoikec"
+              class="p-3"
+              style="
+                background-color: #007bff;
+                border-radius: 12px;
+                color: #fff;
+                text-decoration: none;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: fit-content;
+                margin: 0px auto;
+                gap: 8px;
+              "
+            >
+              <img
+                src="../static/img//chrome-logo.svg"
+                width="24px"
+                height="24px"
+              />
+              Add Merlin To Chrome It's Free
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Icons Grid -->
+    <section class="features-icons bg-light text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+              <div class="features-icons-icon d-flex">
+                <i class="icon-screen-desktop m-auto text-primary"></i>
+              </div>
+              <h3>Reading is Faster</h3>
+              <p class="lead mb-0">Blah blah welcome to my video begone!</p>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+              <div class="features-icons-icon d-flex">
+                <i class="icon-layers m-auto text-primary"></i>
+              </div>
+              <h3>Probably Won't Fail</h3>
+              <p class="lead mb-0">
+                Featuring the latest build of an undocumented API.
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+              <div class="features-icons-icon d-flex">
+                <i class="icon-check m-auto text-primary"></i>
+              </div>
+              <h3>Easy to Use</h3>
+              <p class="lead mb-0">
+                Website definitely made with a bootstrap template.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

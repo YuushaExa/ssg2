@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reddit Search</title>
+  <style>
+    /* CSS Code (from style.css) */
+    body {
+      font-family: sans-serif;
+    }
+
+    .search-container {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .search-container input,
+    .search-container select,
+    .search-container button {
+      padding: 8px;
+      margin-right: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-gap: 15px;
+    }
+
+    .post {
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .post-title a {
+      text-decoration: none;
+      color: blue;
+    }
+
+    .post-info {
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Reddit Search</h1>
+
+  <div class="search-container">
+    <input type="text" id="search-query" placeholder="Search Reddit...">
+    <input type="text" id="subreddit" placeholder="Subreddit (optional)">
+    <select id="sort">
+      <option value="relevance">Relevance</option>
+      <option value="hot">Hot</option>
+      <option value="top">Top</option>
+      <option value="new">New</option>
+      <option value="comments">Comments</option>
+    </select>
+    <select id="time">
+      <option value="all">All Time</option>
+      <option value="hour">Past Hour</option>
+      <option value="day">Past Day</option>
+      <option value="week">Past Week</option>
+      <option value="month">Past Month</option>
+      <option value="year">Past Year</option>
+    </select>
+    <button id="search-button">Search</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script>
+    // JavaScript Code (from script.js)
+    const searchButton = document.getElementById('search-button');
+    const searchQueryInput = document.getElementById('search-query');
+    const subredditInput = document.getElementById('subreddit');
+    const sortSelect = document.getElementById('sort');
+    const timeSelect = document.getElementById('time');
+    const resultsContainer = document.getElementById('results');
+
+    searchButton.addEventListener('click', () => {
+      const query = searchQueryInput.value;
+      const subreddit = subredditInput.value;
+      const sort = sortSelect.value;
+      const time = timeSelect.value;
+
+      if (!query) {
+        alert('Please enter a search query.');
+        return;
+      }
+
+      // Construct the API URL (adjust if your API is hosted elsewhere)
+      const apiUrl = `http://localhost:3000/api/search?q=${encodeURIComponent(query)}&subreddit=${encodeURIComponent(subreddit)}&sort=${sort}&time=${time}`;
+
+      // Fetch data from the API
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          displayResults(data);
+        })
+        .catch(error => {
+          console.error('Error fetching or parsing data:', error);
+          resultsContainer.innerHTML = '<p>Error fetching results. Please try again.</p>';
+        });
+    });
+
+    function displayResults(posts) {
+      resultsContainer.innerHTML = ''; // Clear previous results
+
+      if (posts.length === 0) {
+        resultsContainer.innerHTML = '<p>No results found.</p>';
+        return;
+      }
+
+      posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.classList.add('post');
+
+        postElement.innerHTML = `
+          <h3 class="post-title"><a href="${post.url}" target="_blank">${post.title}</a></h3>
+          <p class="post-info">
+            Posted by u/${post.author} in r/${post.subreddit} | 
+            Score: ${post.score} | 
+            Comments: ${post.numComments} |
+            Created: ${new Date(post.created * 1000).toLocaleString()}
+          </p>
+        `;
+
+        resultsContainer.appendChild(postElement);
+      });
+    }
+  </script>
+</body>
+</html>

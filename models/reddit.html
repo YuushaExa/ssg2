@@ -109,31 +109,40 @@
         });
     });
 
-    function displayResults(posts) {
-      resultsContainer.innerHTML = ''; // Clear previous results
+function displayResults(posts) {
+  resultsContainer.innerHTML = ''; // Clear previous results
 
-      if (posts.length === 0) {
-        resultsContainer.innerHTML = '<p>No results found.</p>';
-        return;
-      }
+  if (posts.length === 0) {
+    resultsContainer.innerHTML = '<p>No results found.</p>';
+    return;
+  }
 
-      posts.forEach(post => {
-        const postElement = document.createElement('div');
-        postElement.classList.add('post');
+  posts.forEach(post => {
+    const postElement = document.createElement('div');
+    postElement.classList.add('post');
 
-        postElement.innerHTML = `
-          <h3 class="post-title"><a href="${post.url}" target="_blank">${post.title}</a></h3>
-          <p class="post-info">
-            Posted by u/${post.author} in r/${post.subreddit} | 
-            Score: ${post.score} | 
-            Comments: ${post.numComments} |
-            Created: ${new Date(post.created * 1000).toLocaleString()}
-          </p>
-        `;
+    postElement.innerHTML = `
+      <h3 class="post-title"><a href="${post.url}" target="_blank">${post.title}</a></h3>
+      <p class="post-info">
+        Posted by u/${post.author} in r/${post.subreddit} | 
+        Score: ${post.score} | 
+        Comments: ${post.numComments} |
+        Created: ${new Date(post.created * 1000).toLocaleString()}
+      </p>
+      <div class="comments-container">
+        <h4>Comments:</h4>
+        ${post.comments.map(comment => `
+          <div class="comment">
+            <p class="comment-info">u/${comment.author} | Score: ${comment.score} | Created: ${new Date(comment.created * 1000).toLocaleString()}</p>
+            <p>${comment.body}</p>
+          </div>
+        `).join('')}
+      </div>
+    `;
 
-        resultsContainer.appendChild(postElement);
-      });
-    }
+    resultsContainer.appendChild(postElement);
+  });
+}
   </script>
 </body>
 </html>

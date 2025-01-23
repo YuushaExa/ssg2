@@ -1,279 +1,417 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat AI</title>
-  <link
-    href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css"
-    rel="stylesheet"
-  />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
-    /* Combined and Minified CSS */
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.3;
-      color: #333;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background-color: #fff;
-      margin: 0;
-    }
+<title>Chat AI</title>
+<link
+  href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css"
+  rel="stylesheet"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  /* Combined and Minified CSS */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  footer {
+    text-align: center;
+    width: 100%;
+    margin-top: auto;
+    position: fixed;
+    bottom: 0;
+  }
 
-    .chat-container {
-      width: 100%;
-      max-width: 821px;
-      border-radius: 10px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+  header {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 18px;
+    z-index: 1;
+  }
+  aside {
+    width: 260px;
+    max-width: 260px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
 
-    .messages-container {
-      overflow-y: auto;
-      max-height: 70vh;
-      padding: 10px;
-      border: 1px solid #d4dbe9;
-      border-radius: 7px;
-      background-color: #f9f9f9;
-    }
+  main {
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 821px;
+    height: 100%;
+    margin: auto;
+    display: flex;
+    padding-top: 40px;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.3;
+    color: #333;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #fff;
+    margin: 0;
+  }
 
-    .input-textarea {
-      width: 100%;
-      height: 80px;
-      padding: 10px;
-      border: 1px solid #d4dbe9;
-      border-radius: 7px;
-      font-size: 14px;
-      line-height: 1.5;
-      resize: none;
-      outline: none;
-      background-color: #fff;
-    }
+  .chat-container {
+    width: 100%;
+    border-radius: 10px;
+    padding: 10px;
+  }
 
-    .buttons-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
+  .messages-container {
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
 
-    .run-button,
-    .clear-button {
-      border: none;
-      padding: 8px 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      font-size: 14px;
-    }
+  .input-textarea {
+    width: calc(100% - 20px);
+    height: 50px;
+    padding: 10px;
+    border: 1px solid #d4dbe9;
+    border-radius: 7px;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    background-color: #fff;
+  }
 
-    .run-button {
-      background-color: #007bff;
-      color: #fff;
-    }
+  .buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3px 0;
+  }
 
-    .run-button:hover,
-    .run-button:disabled {
-      background-color: #0056b3;
-    }
+  .run-button,
+  .close-button,
+  .clear-button {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+  }
 
-    .clear-button {
-      background-color: #6c757d;
-      color: #fff;
-    }
+  .run-button {
+    background-color: #007bff;
+    color: #fff;
+  }
 
-    .clear-button:hover {
-      background-color: #5a6268;
-    }
+  .run-button:hover,
+  .run-button:disabled {
+    background-color: #0056b3;
+  }
 
-    .user-message {
-      width: max-content;
-      max-width: 80%;
-      padding: 10px;
-      margin-bottom: 10px;
-      background-color: #eff6ff;
-      border-radius: 15px;
-      align-self: flex-end;
-    }
+  .close-button {
+    background-color: #dc3545;
+    color: #fff;
+  }
 
-    .model-message {
-      width: max-content;
-      max-width: 80%;
-      padding: 10px;
-      margin-bottom: 10px;
-      background-color: #f5f5f5;
-      border-radius: 15px;
-      align-self: flex-start;
-    }
+  .close-button:hover {
+    background-color: #c82333;
+  }
 
-    .input-list-container {
-      flex-grow: 1;
-    }
+  .clear-button {
+    background-color: #6c757d;
+    color: #fff;
+  }
 
-    .input-list {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-  <div class="chat-container">
-    <div class="messages-container"></div>
-    <textarea
-      class="input-textarea"
-      placeholder="Enter your prompt here..."
-    ></textarea>
-    <div class="buttons-container">
-      <div class="input-list-container">
-        <select class="input-list">
-          <option value="">Select a Prompt</option>
-          <option value="Fix Grammar - ">Fix Grammar</option>
-          <option value="What is ">What is</option>
-          <option value="Top 10 anime">Top 10 anime</option>
-          <option value="Explain like I'm 5: ">Explain like I'm 5</option>
-          <option value="Summarize this: ">Summarize this</option>
-          <option value="Continue ">Continue</option>
-        </select>
-      </div>
-      <button class="run-button">Run</button>
-      <button class="clear-button">Clear</button>
+  .clear-button:hover {
+    background-color: #5a6268;
+  }
+
+  .chat-container h1,
+  .chat-container h2,
+  .chat-container h3,
+  .chat-container ul,
+  .chat-container ol,
+  .chat-container li,
+  .chat-container strong,
+  .chat-container em,
+  .chat-container a,
+  .chat-container pre,
+  .chat-container code {
+    margin-bottom: 10px;
+  }
+
+  .chat-container h1 {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .chat-container h2 {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .chat-container h3 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .chat-container ul,
+  .chat-container ol {
+    padding-left: 20px;
+  }
+
+  .chat-container ol,
+  .chat-container ul {
+    list-style: auto;
+  }
+
+  .chat-container li {
+    margin-bottom: 5px;
+  }
+
+  .chat-container strong {
+    font-weight: 700;
+  }
+
+  .chat-container em {
+    font-style: italic;
+  }
+
+  .chat-container a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .chat-container a:hover {
+    text-decoration: underline;
+  }
+
+  .chat-container pre {
+  }
+
+  .chat-container code {
+    border-radius: 10px;
+  }
+
+  .user-message {
+    width: max-content;
+    padding: 5px 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: #eff6ff;
+    border-radius: 15px;
+    max-width: calc(100% - 150px);
+  }
+
+  .model-message {
+    border-radius: 15px;
+    position: relative;
+    margin: 10px 0 10px 10px;
+    background-color: #f5f5f5;
+    padding: 5px 10px;
+  }
+
+  .input-list-container {
+    margin-right: 10px;
+  }
+
+  .input-list {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+</style>
+
+<div class="chat-container">
+  <div class="messages-container"></div>
+  <textarea
+    class="input-textarea"
+    placeholder="Enter your prompt here..."
+  ></textarea>
+  <div class="buttons-container">
+    <div class="input-list-container">
+      <select class="input-list">
+        <option value="">Select a Prompt</option>
+        <option value="Fix Grammar - ">Fix Grammar</option>
+        <option value="What is ">What is</option>
+        <option value="Top 10 anime">Top 10 anime</option>
+        <option value="Explain like I'm 5: ">Explain like I'm 5</option>
+        <option value="Summarize this: ">Summarize this</option>
+        <option value="Continue ">Continue</option>
+      </select>
     </div>
+    <button class="run-button">Run</button>
+    <button class="clear-button">Clear</button>
   </div>
+</div>
 
-  <script>
-    (function () {
-      // --- Initialize Libraries ---
-      marked.setOptions({
-        highlight: function (code, language) {
-          const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
-          return hljs.highlight(code, { language: validLanguage }).value;
-        },
-      });
+<script>
+  (function () {
+    /* Main chat code */
+    marked.setOptions({
+      highlight: function (code, language) {
+        const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
+        return hljs.highlight(code, { language: validLanguage }).value;
+      },
+    });
 
-      // --- DOM Elements ---
-      const messagesContainer = document.querySelector('.messages-container');
-      const inputTextArea = document.querySelector('.input-textarea');
-      const runButton = document.querySelector('.run-button');
-      const clearButton = document.querySelector('.clear-button');
-      const inputListSelect = document.querySelector('.input-list');
+    function initializeChat() {
+      (async function () {
+        // --- DOM Element Access ---
 
-      // --- Chat State ---
-      let chatHistory = [];
-      let isStreaming = false;
+        const chatContainer = document.querySelector('.chat-container');
+        const messagesContainer = document.querySelector('.messages-container');
+        const inputTextArea = document.querySelector('.input-textarea');
+        const runButton = document.querySelector('.run-button');
+        const clearButton = document.querySelector('.clear-button');
+        const inputListSelect = document.querySelector('.input-list');
 
-      // --- Helper Functions ---
-      function addMessageToChat(role, content) {
-        chatHistory.push({ role, parts: [{ text: content }] });
-        renderChat();
-      }
+        // --- Chat Logic ---
 
-      function renderChat() {
-        messagesContainer.innerHTML = chatHistory
-          .map((message) => {
-            const isUser = message.role === 'user';
-            const content = isUser
-              ? message.parts[0].text
-              : marked.parse(message.parts[0].text);
-            return `
-              <div class="${isUser ? 'user-message' : 'model-message'}">
-                ${content}
-              </div>
-            `;
-          })
-          .join('');
+        let chatHistory = [];
+        let streamingResponse = false;
 
-        // Apply syntax highlighting
-        messagesContainer.querySelectorAll('pre code').forEach((block) => {
-          hljs.highlightBlock(block);
-        });
+        function updateChatDisplay() {
+          messagesContainer.innerHTML = '';
+          const fragment = document.createDocumentFragment();
 
-        // Scroll to the bottom
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      }
+          for (const message of chatHistory) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(
+              message.role === 'user' ? 'user-message' : 'model-message'
+            );
 
-      async function fetchModelResponse(prompt) {
-        try {
-          const response = await fetch('https://chatai-flame-eta.vercel.app/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chatHistory }),
-          });
-
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-          let accumulatedResponse = '';
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const textChunk = decoder.decode(value);
-            const dataChunks = textChunk
-              .split('\n\n')
-              .filter((chunk) => chunk.trim() !== '');
-
-            for (const dataChunk of dataChunks) {
-              if (dataChunk.startsWith('data:')) {
-                const jsonData = JSON.parse(dataChunk.substring(5).trim());
-                if (jsonData.text) {
-                  accumulatedResponse += jsonData.text;
-                  renderChat();
-                }
-              }
+            // Parse and display message content using marked
+            if (message.role === 'model') {
+              messageElement.innerHTML = marked.parse(message.parts[0].text);
+            } else {
+              messageElement.textContent = message.parts[0].text;
             }
+
+            fragment.appendChild(messageElement);
           }
 
-          addMessageToChat('model', accumulatedResponse);
-        } catch (error) {
-          console.error('Error:', error);
-          addMessageToChat('model', `Error: ${error.message}`);
-        } finally {
-          isStreaming = false;
+          messagesContainer.appendChild(fragment);
+
+          // Apply syntax highlighting to code blocks
+          messagesContainer.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightBlock(block);
+          });
+
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-      }
 
-      // --- Event Listeners ---
-      runButton.addEventListener('click', async () => {
-        const prompt = inputTextArea.value.trim();
-        if (!prompt) return alert('Please enter a prompt.');
+        function addMessageToChatHistory(role, content) {
+          chatHistory.push({ role, parts: [{ text: content }] });
+          if (!streamingResponse) {
+              updateChatDisplay();
+          }
+        }
 
-        isStreaming = true;
-        runButton.disabled = true;
-        runButton.textContent = 'Running...';
+        async function getModelResponse(prompt) {
+          addMessageToChatHistory('user', prompt);
+          const modelMessageElement = document.createElement('div');
+          modelMessageElement.classList.add('model-message');
+          messagesContainer.appendChild(modelMessageElement);
 
-        await fetchModelResponse(prompt);
+          try {
+            const response = await fetch(
+              'https://chatai-flame-eta.vercel.app/api/generate',
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chatHistory }),
+              }
+            );
 
-        runButton.disabled = false;
-        runButton.textContent = 'Run';
-        inputTextArea.value = '';
-      });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-      clearButton.addEventListener('click', () => {
-        chatHistory = [];
-        renderChat();
-      });
+            const reader = response.body.getReader();
+            const textDecoder = new TextDecoder();
+            let accumulatedResponse = '';
+            streamingResponse = true;
 
-      inputListSelect.addEventListener('change', () => {
-        inputTextArea.value = inputListSelect.value;
-      });
-    })();
-  </script>
-</body>
-</html>
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const textChunk = textDecoder.decode(value);
+              const dataChunks = textChunk
+                .split('\n\n')
+                .filter((chunk) => chunk.trim() !== '');
+
+              for (const dataChunk of dataChunks) {
+                const dataEvent = dataChunk.split(':')[0].trim();
+                if (dataEvent === 'data') {
+                  const jsonData = JSON.parse(dataChunk.substring(5).trim());
+                  if (jsonData.text) {
+                    accumulatedResponse += jsonData.text;
+                    // Parse and update the content in real-time using marked
+                    modelMessageElement.innerHTML = marked.parse(accumulatedResponse);
+                    // Apply syntax highlighting in real-time if new code blocks are added
+                    modelMessageElement.querySelectorAll('pre code').forEach((block) => {
+                      hljs.highlightBlock(block);
+                    });
+                  }
+                } else if (dataEvent === 'event' && dataChunk.includes('end')) {
+                  console.log('Stream ended');
+                  break;
+                }
+              }
+              messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            addMessageToChatHistory('model', accumulatedResponse);
+            streamingResponse = false;
+          } catch (error) {
+            console.error('Error:', error);
+            modelMessageElement.textContent = `Error: ${error.message}`;
+          }
+        }
+
+        // --- Event Listeners ---
+
+        runButton.addEventListener('click', async () => {
+          const prompt = inputTextArea.value.trim();
+          if (prompt === '') {
+            alert('Please enter a prompt.');
+            return;
+          }
+
+          runButton.disabled = true;
+          runButton.innerText = 'Running...';
+
+          await getModelResponse(prompt);
+
+          runButton.disabled = false;
+          runButton.innerText = 'Run';
+          inputTextArea.value = '';
+        });
+
+        clearButton.addEventListener('click', () => {
+          chatHistory = [];
+          updateChatDisplay();
+        });
+
+        inputListSelect.addEventListener('change', () => {
+          inputTextArea.value = inputListSelect.value;
+        });
+
+        chatContainer.style.display = 'block';
+      })();
+    }
+
+    /* Initialize the chat directly */
+    initializeChat();
+  })();
+</script>

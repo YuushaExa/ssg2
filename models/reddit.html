@@ -90,7 +90,7 @@
       }
 
       // Construct the API URL (adjust if your API is hosted elsewhere)
-      const apiUrl = `https://search-reddit.vercel.app/api/search?q=${encodeURIComponent(query)}&subreddit=${encodeURIComponent(subreddit)}&sort=${sort}&time=${time}`;
+      const apiUrl = `https://search-reddit.vercel.app/api/search?q=${encodeURIComponent(query)}&sort=${sort}&time=${time}`;
 
       // Fetch data from the API
       fetch(apiUrl)

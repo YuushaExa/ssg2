@@ -3,27 +3,24 @@
 <head>
   <title>Article Extractor</title>
   <style>
+    /* Same CSS as before */
     body {
       font-family: sans-serif;
     }
-
     .container {
       width: 80%;
       margin: 0 auto;
     }
-
     .input-area {
       display: flex;
       margin-bottom: 20px;
     }
-
     #urlInput {
       flex-grow: 1;
       padding: 10px;
       border: 1px solid #ccc;
       margin-right: 10px;
     }
-
     #extractButton {
       padding: 10px 20px;
       background-color: #4CAF50;
@@ -31,7 +28,6 @@
       border: none;
       cursor: pointer;
     }
-
     #result {
       margin-top: 20px;
       border: 1px solid #ccc;
@@ -51,26 +47,27 @@
       <div id="articleContent"></div>
     </div>
   </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.js"></script>
   <script>
     const urlInput = document.getElementById('urlInput');
     const extractButton = document.getElementById('extractButton');
     const articleContent = document.getElementById('articleContent');
-
     extractButton.addEventListener('click', async () => {
       const url = urlInput.value;
-
       if (!url) {
         alert("Please enter a URL.");
         return;
       }
-
       articleContent.innerHTML = "<p>Loading...</p>";
-
       try {
-        const response = await fetch(`https://chatai3-zeta.vercel.app/extract?url=${encodeURIComponent(url)}`);
-        const article = await response.json();
-
+        // Still use a proxy to avoid CORS issues (or use your own)
+        const proxyUrl = 'https://corsproxy.io/?url=';
+        const response = await fetch(proxyUrl + url);
+        const htmlString = await response.text();
+        const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+        // Use Readability from the CDN
+        const reader = new Readability(doc);
+        const article = reader.parse();
         if (article) {
           articleContent.innerHTML = `
             <h3>${article.title}</h3>
@@ -80,7 +77,6 @@
         } else {
           articleContent.innerHTML = "<p>Could not extract article content.</p>";
         }
-
       } catch (error) {
         console.error("Error fetching or parsing content:", error);
         articleContent.innerHTML = `<p>Error: ${error.message}</p>`;

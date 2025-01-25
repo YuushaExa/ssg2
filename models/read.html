@@ -3,7 +3,6 @@
 <head>
   <title>Article Extractor</title>
   <style>
-    /* Same CSS as before */
     body {
       font-family: sans-serif;
     }
@@ -53,7 +52,6 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.5.0/Readability.js"></script>
   <script>
     const urlInput = document.getElementById('urlInput');
     const extractButton = document.getElementById('extractButton');
@@ -70,16 +68,8 @@
       articleContent.innerHTML = "<p>Loading...</p>";
 
       try {
-        // Still use a proxy to avoid CORS issues (or use your own)
-        const proxyUrl = 'https://corsproxy.io/?url=';
-        const response = await fetch(proxyUrl + url);
-        const htmlString = await response.text();
-
-        const doc = new DOMParser().parseFromString(htmlString, 'text/html');
-
-        // Use Readability from the CDN
-        const reader = new Readability(doc);
-        const article = reader.parse();
+        const response = await fetch(`/extract?url=${encodeURIComponent(url)}`);
+        const article = await response.json();
 
         if (article) {
           articleContent.innerHTML = `

@@ -182,30 +182,55 @@
     }
   }
 
-  async function streamResponse(response) {
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-    isStreaming = true;
+async function streamResponse(response) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  isStreaming = true;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const chunks = buffer.split('\n\n');
-      buffer = chunks.pop();
+    buffer += decoder.decode(value, { stream: true });
+    const chunks = buffer.split('\n\n');
+    buffer = chunks.pop() || '';
 
-      for (const chunk of chunks) {
-        const [type, data] = chunk.split(':');
-        if (type.trim() === 'data') {
-          const { text } = JSON.parse(data.trim());
-          chatHistory[chatHistory.length - 1].parts[0].text += text;
-          renderMessages();
+    for (const chunk of chunks) {
+      const [type, ...dataParts] = chunk.split(':');
+      const data = dataParts.join(':').trim();
+      
+      if (type.trim() === 'data') {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.text) {
+            chatHistory[chatHistory.length - 1].parts[0].text += parsed.text;
+            renderMessages();
+          }
+        } catch (err) {
+          console.error('JSON parse error:', err, 'Data:', data);
         }
       }
     }
   }
+  
+  // Process any remaining buffer
+  if (buffer) {
+    const [type, ...dataParts] = buffer.split(':');
+    const data = dataParts.join(':').trim();
+    if (type.trim() === 'data') {
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.text) {
+          chatHistory[chatHistory.length - 1].parts[0].text += parsed.text;
+          renderMessages();
+        }
+      } catch (err) {
+        console.error('Final JSON parse error:', err, 'Data:', data);
+      }
+    }
+  }
+}
 
   dom.chatForm.addEventListener('submit', handleSubmit);
   dom.clearBtn.addEventListener('click', () => {

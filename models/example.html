@@ -1,225 +1,85 @@
 <title>Chat AI</title>
-<link
-  href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css"
-  rel="stylesheet"
-/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-dark.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
-  /* Combined and Minified CSS */
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-  footer {
-    text-align: center;
-    width: 100%;
-    margin-top: auto;
-    position: fixed;
-    bottom: 0;
-  }
-
-  header {
-    width: 100%;
-    position: fixed;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    padding-bottom: 18px;
-    z-index: 1;
-  }
-  aside {
-    width: 260px;
-    max-width: 260px;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-
-  main {
-    box-sizing: border-box;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 821px;
-    height: 100%;
-    margin: auto;
-    display: flex;
-    padding-top: 40px;
-  }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.3;
-    color: #333;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #fff;
-    margin: 0;
-  }
-
+  /* Optimized CSS */
   .chat-container {
     width: 100%;
-    border-radius: 10px;
+    max-width: 821px;
+    margin: auto;
     padding: 10px;
+    border-radius: 10px;
   }
 
   .messages-container {
     overflow-y: auto;
     margin-bottom: 10px;
+    max-height: 70vh;
+  }
+
+  .chat-form {
+    position: relative;
   }
 
   .input-textarea {
-    width: calc(100% - 20px);
+    width: 100%;
     height: 50px;
     padding: 10px;
     border: 1px solid #d4dbe9;
     border-radius: 7px;
     font-size: 14px;
     line-height: 1.5;
-    resize: none;
-    outline: none;
+    resize: vertical;
     background-color: #fff;
   }
 
   .buttons-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 3px 0;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: flex-end;
   }
 
-  .run-button,
-  .close-button,
-  .clear-button {
+  .btn {
     border: none;
     padding: 8px 16px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: opacity 0.2s;
     font-size: 14px;
   }
 
-  .run-button {
+  .btn-primary {
     background-color: #007bff;
     color: #fff;
   }
 
-  .run-button:hover,
-  .run-button:disabled {
-    background-color: #0056b3;
-  }
-
-  .close-button {
+  .btn-danger {
     background-color: #dc3545;
     color: #fff;
   }
 
-  .close-button:hover {
-    background-color: #c82333;
-  }
-
-  .clear-button {
+  .btn-secondary {
     background-color: #6c757d;
     color: #fff;
   }
 
-  .clear-button:hover {
-    background-color: #5a6268;
-  }
-
-  .chat-container h1,
-  .chat-container h2,
-  .chat-container h3,
-  .chat-container ul,
-  .chat-container ol,
-  .chat-container li,
-  .chat-container strong,
-  .chat-container em,
-  .chat-container a,
-  .chat-container pre,
-  .chat-container code {
-    margin-bottom: 10px;
-  }
-
-  .chat-container h1 {
-    font-size: 24px;
-    font-weight: 700;
-  }
-
-  .chat-container h2 {
-    font-size: 20px;
-    font-weight: 700;
-  }
-
-  .chat-container h3 {
-    font-size: 18px;
-    font-weight: 700;
-  }
-
-  .chat-container ul,
-  .chat-container ol {
-    padding-left: 20px;
-  }
-
-  .chat-container ol,
-  .chat-container ul {
-    list-style: auto;
-  }
-
-  .chat-container li {
-    margin-bottom: 5px;
-  }
-
-  .chat-container strong {
-    font-weight: 700;
-  }
-
-  .chat-container em {
-    font-style: italic;
-  }
-
-  .chat-container a {
-    color: #007bff;
-    text-decoration: none;
-  }
-
-  .chat-container a:hover {
-    text-decoration: underline;
-  }
-
-  .chat-container pre {
-  }
-
-  .chat-container code {
-    border-radius: 10px;
+  .message {
+    max-width: 90%;
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 12px;
+    word-break: break-word;
   }
 
   .user-message {
-    width: max-content;
-    padding: 5px 10px;
-    white-space: pre-wrap;
-    word-break: break-word;
     background-color: #eff6ff;
-    border-radius: 15px;
-    max-width: calc(100% - 150px);
+    margin-left: auto;
   }
 
   .model-message {
-    border-radius: 15px;
-    position: relative;
-    margin: 10px 0 10px 10px;
     background-color: #f5f5f5;
-    padding: 5px 10px;
-  }
-
-  .input-list-container {
-    margin-right: 10px;
   }
 
   .input-list {
@@ -227,19 +87,21 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
+    margin-right: auto;
   }
 </style>
 
 <div class="chat-container">
-  <div class="messages-container"></div>
-  <textarea
-    class="input-textarea"
-    placeholder="Enter your prompt here..."
-  ></textarea>
-  <div class="buttons-container">
-    <div class="input-list-container">
-      <select class="input-list">
-        <option value="">Select a Prompt</option>
+  <div class="messages-container" role="log" aria-live="polite"></div>
+  <form class="chat-form">
+    <textarea 
+      class="input-textarea"
+      placeholder="Enter your prompt here..."
+      aria-label="Chat input"
+    ></textarea>
+    <div class="buttons-container">
+      <select class="input-list" aria-label="Prompt templates">
+        <option value="">Templates</option>
         <option value="Fix Grammar - ">Fix Grammar</option>
         <option value="What is ">What is</option>
         <option value="Top 10 anime">Top 10 anime</option>
@@ -247,171 +109,117 @@
         <option value="Summarize this: ">Summarize this</option>
         <option value="Continue ">Continue</option>
       </select>
+      <button type="button" class="btn btn-secondary" aria-label="Clear chat">Clear</button>
+      <button type="submit" class="btn btn-primary" aria-label="Send message">Run</button>
     </div>
-    <button class="run-button">Run</button>
-    <button class="clear-button">Clear</button>
-  </div>
+  </form>
 </div>
 
 <script>
-  (function () {
-    /* Main chat code */
-    marked.setOptions({
-      highlight: function (code, language) {
-        const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
-        return hljs.highlight(code, { language: validLanguage }).value;
-      },
-    });
+(function() {
+  'use strict';
+  
+  const dom = {
+    messagesContainer: document.querySelector('.messages-container'),
+    chatForm: document.querySelector('.chat-form'),
+    inputText: document.querySelector('.input-textarea'),
+    clearBtn: document.querySelector('.btn-secondary'),
+    templateSelect: document.querySelector('.input-list')
+  };
 
-    function initializeChat() {
-      (async function () {
-        // --- DOM Element Access ---
+  let chatHistory = [];
+  let isStreaming = false;
 
-        const chatContainer = document.querySelector('.chat-container');
-        const messagesContainer = document.querySelector('.messages-container');
-        const inputTextArea = document.querySelector('.input-textarea');
-        const runButton = document.querySelector('.run-button');
-        const clearButton = document.querySelector('.clear-button');
-        const inputListSelect = document.querySelector('.input-list');
+  marked.setOptions({
+    highlight: (code, lang) => hljs.highlight(code, { 
+      language: hljs.getLanguage(lang) ? lang : 'plaintext' 
+    }).value
+  });
 
-        // --- Chat Logic ---
+  function addMessage(role, content) {
+    chatHistory.push({ role, parts: [{ text: content }] });
+    if (!isStreaming) renderMessages();
+  }
 
-        let chatHistory = [];
-        let streamingResponse = false;
+  function renderMessages() {
+    dom.messagesContainer.innerHTML = chatHistory.map(msg => `
+      <div class="message ${msg.role}-message" role="${msg.role}">
+        ${msg.role === 'model' ? marked.parse(msg.parts[0].text) : msg.parts[0].text}
+      </div>
+    `).join('');
+    
+    dom.messagesContainer.querySelectorAll('pre code').forEach(hljs.highlightBlock);
+    dom.messagesContainer.scrollTop = dom.messagesContainer.scrollHeight;
+  }
 
-        function updateChatDisplay() {
-          messagesContainer.innerHTML = '';
-          const fragment = document.createDocumentFragment();
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const prompt = dom.inputText.value.trim();
+    if (!prompt || isStreaming) return;
 
-          for (const message of chatHistory) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add(
-              message.role === 'user' ? 'user-message' : 'model-message'
-            );
+    const submitBtn = dom.chatForm.querySelector('[type="submit"]');
+    submitBtn.disabled = true;
+    
+    try {
+      addMessage('user', prompt);
+      dom.inputText.value = '';
+      
+      const response = await fetch('https://chatai-flame-eta.vercel.app/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatHistory })
+      });
 
-            // Parse and display message content using marked
-            if (message.role === 'model') {
-              messageElement.innerHTML = marked.parse(message.parts[0].text);
-            } else {
-              messageElement.textContent = message.parts[0].text;
-            }
-
-            fragment.appendChild(messageElement);
-          }
-
-          messagesContainer.appendChild(fragment);
-
-          // Apply syntax highlighting to code blocks
-          messagesContainer.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightBlock(block);
-          });
-
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function addMessageToChatHistory(role, content) {
-          chatHistory.push({ role, parts: [{ text: content }] });
-          if (!streamingResponse) {
-              updateChatDisplay();
-          }
-        }
-
-        async function getModelResponse(prompt) {
-          addMessageToChatHistory('user', prompt);
-          const modelMessageElement = document.createElement('div');
-          modelMessageElement.classList.add('model-message');
-          messagesContainer.appendChild(modelMessageElement);
-
-          try {
-            const response = await fetch(
-              'https://chatai-flame-eta.vercel.app/api/generate',
-              {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chatHistory }),
-              }
-            );
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const reader = response.body.getReader();
-            const textDecoder = new TextDecoder();
-            let accumulatedResponse = '';
-            streamingResponse = true;
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              const textChunk = textDecoder.decode(value);
-              const dataChunks = textChunk
-                .split('\n\n')
-                .filter((chunk) => chunk.trim() !== '');
-
-              for (const dataChunk of dataChunks) {
-                const dataEvent = dataChunk.split(':')[0].trim();
-                if (dataEvent === 'data') {
-                  const jsonData = JSON.parse(dataChunk.substring(5).trim());
-                  if (jsonData.text) {
-                    accumulatedResponse += jsonData.text;
-                    // Parse and update the content in real-time using marked
-                    modelMessageElement.innerHTML = marked.parse(accumulatedResponse);
-                    // Apply syntax highlighting in real-time if new code blocks are added
-                    modelMessageElement.querySelectorAll('pre code').forEach((block) => {
-                      hljs.highlightBlock(block);
-                    });
-                  }
-                } else if (dataEvent === 'event' && dataChunk.includes('end')) {
-                  console.log('Stream ended');
-                  break;
-                }
-              }
-              messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-
-            addMessageToChatHistory('model', accumulatedResponse);
-            streamingResponse = false;
-          } catch (error) {
-            console.error('Error:', error);
-            modelMessageElement.textContent = `Error: ${error.message}`;
-          }
-        }
-
-        // --- Event Listeners ---
-
-        runButton.addEventListener('click', async () => {
-          const prompt = inputTextArea.value.trim();
-          if (prompt === '') {
-            alert('Please enter a prompt.');
-            return;
-          }
-
-          runButton.disabled = true;
-          runButton.innerText = 'Running...';
-
-          await getModelResponse(prompt);
-
-          runButton.disabled = false;
-          runButton.innerText = 'Run';
-          inputTextArea.value = '';
-        });
-
-        clearButton.addEventListener('click', () => {
-          chatHistory = [];
-          updateChatDisplay();
-        });
-
-        inputListSelect.addEventListener('change', () => {
-          inputTextArea.value = inputListSelect.value;
-        });
-
-        chatContainer.style.display = 'block';
-      })();
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      
+      await streamResponse(response);
+    } catch(err) {
+      console.error('Fetch error:', err);
+      addMessage('model', `Error: ${err.message}`);
+    } finally {
+      submitBtn.disabled = false;
+      isStreaming = false;
     }
+  }
 
-    /* Initialize the chat directly */
-    initializeChat();
-  })();
+  async function streamResponse(response) {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    isStreaming = true;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const chunks = buffer.split('\n\n');
+      buffer = chunks.pop();
+
+      for (const chunk of chunks) {
+        const [type, data] = chunk.split(':');
+        if (type.trim() === 'data') {
+          const { text } = JSON.parse(data.trim());
+          chatHistory[chatHistory.length - 1].parts[0].text += text;
+          renderMessages();
+        }
+      }
+    }
+  }
+
+  dom.chatForm.addEventListener('submit', handleSubmit);
+  dom.clearBtn.addEventListener('click', () => {
+    chatHistory = [];
+    renderMessages();
+  });
+  dom.templateSelect.addEventListener('change', () => {
+    dom.inputText.value = dom.templateSelect.value;
+  });
+  dom.inputText.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      dom.chatForm.requestSubmit();
+    }
+  });
+})();
 </script>
